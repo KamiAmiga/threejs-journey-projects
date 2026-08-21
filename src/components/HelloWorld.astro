@@ -1,0 +1,111 @@
+<script>
+  import * as THREE from 'three'
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+  // Canvas
+  const canvas = document.querySelector('[data-threejs-canvas]')
+
+  // Sizes
+  const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }
+
+  // Scene
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(0xf3f3f3)
+
+  // Geometries
+  const leaveGeometry = new THREE.BoxGeometry(0.16, 1, 0.03)
+  const groundGeometry = new THREE.BoxGeometry(2.5, 0.3, 2.5)
+
+  // Materials
+  const groundColor = new THREE.MeshBasicMaterial({ color: 0xd0fb2c })
+  const leavesColor = new THREE.MeshBasicMaterial({ color: 0x5fcf6d })
+  const rockColor = new THREE.MeshBasicMaterial({ color: 0x2d283f })
+
+  // Assembling objects in the scene
+  const ground = new THREE.Mesh(groundGeometry, groundColor)
+
+  const earth = new THREE.Mesh(
+    groundGeometry,
+    new THREE.MeshBasicMaterial({ color: 0xc89b67 }),
+  )
+
+  const leave1 = new THREE.Mesh(leaveGeometry, leavesColor)
+  const leave2 = new THREE.Mesh(leaveGeometry, leavesColor)
+  const leave3 = new THREE.Mesh(leaveGeometry, leavesColor)
+
+  const rock1 = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.8, 0.6), rockColor)
+  const rock2 = new THREE.Mesh(
+    new THREE.BoxGeometry(0.33, 0.33, 0.33),
+    rockColor,
+  )
+
+  earth.position.y = -0.3
+  earth.scale.set(0.975, 1.75, 0.975)
+
+  leave1.position.set(-0.5, 0.3, -0.25)
+  leave1.rotation.set(0, Math.PI * 0.33, Math.PI * 0.05)
+
+  leave2.position.set(-0.32, 0.1, -0.35)
+  leave2.rotation.set(0, Math.PI * -0.02, Math.PI * -0.02)
+
+  leave3.position.set(0.66, 0.1, 0.6)
+  leave3.rotation.set(Math.PI * 0.1, Math.PI * 0.4, Math.PI * -0.05)
+
+  rock1.position.set(0.165, 0.1, 0.1)
+  rock1.rotation.y = Math.PI * -0.1
+
+  rock2.position.set(0.25, 0.2, 0.8)
+
+  scene.add(ground, earth, leave1, leave2, leave3, rock1, rock2)
+
+  // Camera
+  const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+  camera.lookAt(ground.position)
+  camera.position.set(2, 2, 3)
+  scene.add(camera)
+
+  // Renderer
+  const renderer = canvas
+    ? new THREE.WebGLRenderer({ canvas })
+    : new THREE.WebGLRenderer()
+  renderer.setSize(sizes.width, sizes.height)
+
+  if (!canvas) {
+    document.body.appendChild(renderer.domElement)
+  }
+
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement)
+  controls.enableDamping = true
+  controls.update()
+
+  window.addEventListener('resize', () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  })
+
+  const tick = () => {
+    // Update controls
+    controls.update()
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+  }
+
+  tick()
+</script>

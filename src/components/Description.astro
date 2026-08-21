@@ -1,0 +1,17 @@
+---
+const { title } = Astro.props
+---
+
+<div class="description">
+  <h1 class="description__title">{title}</h1>
+
+  <div class="description__text">
+    <slot />
+  </div>
+</div>
+
+<style>
+  .description {
+    max-width: 80ch;
+  }
+</style>
