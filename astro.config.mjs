@@ -7,5 +7,7 @@ export default defineConfig({
     provider: fontProviders.fontsource(),
     name: 'Playpen Sans',
     cssVariable: "--font-primary",
-  }]
+  }],
+  site: 'https://KamiAmiga.github.io',
+  base: '/threejs-journey-projects'
 });
