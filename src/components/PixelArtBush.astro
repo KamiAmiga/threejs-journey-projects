@@ -1,0 +1,182 @@
+<script>
+  import * as THREE from 'three'
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+  // Canvas
+  const canvas = document.querySelector('[data-threejs-canvas]')
+
+  // Common
+  const groundThickness = 0.2
+  const bushWidth = 1
+  const leaveWidth = bushWidth / 48
+
+  // TextureLoader
+  const loadingManager = new THREE.LoadingManager()
+  const textureLoader = new THREE.TextureLoader(loadingManager)
+
+  // Sizes
+  const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }
+
+  // Scene
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(0xcbeaf1)
+
+  // Geometries
+  const leaveGeometry = new THREE.PlaneGeometry(leaveWidth, leaveWidth * 4)
+  const groundGeometry = new THREE.CylinderGeometry(2, 2, groundThickness, 8)
+  const bushGeometry = new THREE.PlaneGeometry(bushWidth, bushWidth * 0.5)
+
+  // Textures
+  const bushColorTexture = textureLoader.load(
+    '/threejs-journey-projects/textures/pixel-art-bush/bush-color.png',
+  )
+  const bushWithFlowerColorTexture = textureLoader.load(
+    '/threejs-journey-projects/textures/pixel-art-bush/bush-with-flower-color.png',
+  )
+  const bushAlphaTexture = textureLoader.load(
+    '/threejs-journey-projects/textures/pixel-art-bush/bush-alpha.png',
+  )
+
+  const textures = [
+    bushColorTexture,
+    bushWithFlowerColorTexture,
+    bushAlphaTexture,
+  ]
+
+  textures.forEach((texture) => {
+    texture.generateMipmaps = false
+    texture.minFilter = THREE.NearestFilter
+    texture.magFilter = THREE.NearestFilter
+  })
+
+  // Materials
+  const groundMaterial = new THREE.MeshStandardMaterial({
+    color: 0xb4e98e,
+    roughness: 0.8,
+  })
+  const earthMaterial = new THREE.MeshStandardMaterial({
+    color: 0xc89b67,
+    roughness: 0.8,
+  })
+  const leaveMaterial = new THREE.MeshStandardMaterial({
+    color: 0x71cab5,
+    roughness: 0.8,
+    side: THREE.DoubleSide,
+  })
+  const bushMaterial = new THREE.MeshBasicMaterial({
+    map: bushColorTexture,
+    alphaMap: bushAlphaTexture,
+    transparent: true,
+    side: THREE.DoubleSide,
+  })
+  const bushWithFlowerMaterial = new THREE.MeshBasicMaterial({
+    map: bushWithFlowerColorTexture,
+    alphaMap: bushAlphaTexture,
+    transparent: true,
+    side: THREE.DoubleSide,
+  })
+
+  // Assembling objects in the scene
+  const ground = new THREE.Mesh(groundGeometry, groundMaterial)
+
+  const earth = new THREE.Mesh(groundGeometry, earthMaterial)
+
+  const bush1 = new THREE.Mesh(bushGeometry, bushWithFlowerMaterial)
+  const bush2 = new THREE.Mesh(bushGeometry, bushWithFlowerMaterial)
+  const bush3 = new THREE.Mesh(bushGeometry, bushMaterial)
+  const bush4 = new THREE.Mesh(bushGeometry, bushMaterial)
+  const bush5 = new THREE.Mesh(bushGeometry, bushMaterial)
+
+  const bushYPos = bushWidth * 0.25
+
+  ground.position.y = groundThickness * -0.5
+  earth.position.y = groundThickness * -1.25
+  earth.scale.set(0.95, 2, 0.95)
+
+  bush1.position.set(1, bushYPos, 0.8)
+  bush2.position.set(0.4, bushYPos, -0.4)
+  bush3.position.set(0.5 - bushWidth, bushYPos, -0.4)
+  bush4.position.set(0.3, bushYPos, 1.2)
+  bush5.position.set(-0.8, bushYPos, 0.7)
+
+  const leaves = new THREE.Group()
+  for (let index = 0; index < 40; index++) {
+    const angle = Math.random() * Math.PI * 2
+    const radius = 0.6 + Math.random()
+    const x = Math.sin(angle) * radius
+    const z = Math.cos(angle) * radius
+
+    // Mesh
+    const leave = new THREE.Mesh(leaveGeometry, leaveMaterial)
+    leave.position.x = x
+    leave.position.y = Math.random() * leaveWidth * 2
+    leave.position.z = z
+
+    // Add to the leaves group
+    leaves.add(leave)
+  }
+
+  scene.add(ground, earth, bush1, bush2, bush3, bush4, bush5, leaves)
+
+  // Lights
+  const ambientLight = new THREE.AmbientLight(0xfefdfa, 1.2)
+  const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x0404a2, 2)
+  const pointLight = new THREE.PointLight(0xffffff, 15)
+  pointLight.position.set(0, 3, 2)
+  hemisphereLight.position.set(0, 0.5, 0)
+
+  scene.add(ambientLight, hemisphereLight, pointLight)
+
+  // Camera
+  const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+  camera.lookAt(ground.position)
+  camera.position.set(0.3, 1.5, 4)
+  scene.add(camera)
+
+  // Renderer
+  const renderer = canvas
+    ? new THREE.WebGLRenderer({ canvas })
+    : new THREE.WebGLRenderer()
+  renderer.setSize(sizes.width, sizes.height)
+
+  if (!canvas) {
+    document.body.appendChild(renderer.domElement)
+  }
+
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement)
+  controls.enableDamping = true
+  controls.minDistance = 2
+  controls.maxDistance = 12
+  controls.update()
+
+  window.addEventListener('resize', () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  })
+
+  const tick = () => {
+    // Update controls
+    controls.update()
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+  }
+
+  tick()
+</script>

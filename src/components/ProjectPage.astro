@@ -1,0 +1,119 @@
+---
+import ThreeJSCanvas from './ThreeJSCanvas.astro'
+import Description from './Description.astro'
+
+const { class: className, title, ...rest } = Astro.props
+---
+
+<div class:list={['project-page', 'squared-paper', className]} {...rest}>
+  <div class="project-page__canvas-wrapper">
+    <div class="project-page__canvas-wrapper__inner">
+      <ThreeJSCanvas />
+
+      <slot name="project-code" />
+    </div>
+
+    <a
+      class="project-page__navigation project-page__navigation--to-desc"
+      href="#project-desc"
+    >
+      Show description
+    </a>
+  </div>
+
+  <div class="project-page__content">
+    <Description
+      title={title}
+      id="project-desc"
+      class="project-page__content__description"
+    >
+      <slot name="project-description" />
+    </Description>
+
+    <div class="project-page__navigation project-page__navigation--to-canvas">
+      <a href="#threejs-canvas">Hide description</a>
+    </div>
+
+    <div class="project-page__navigation project-page__navigation--to-home">
+      <a href="/threejs-journey-projects">Back to chapters</a>
+    </div>
+  </div>
+</div>
+
+<style>
+  .project-page {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    overflow: clip;
+  }
+
+  .project-page__canvas-wrapper {
+    --move-anim-duration: 0.8s;
+    position: absolute;
+    inset: 0;
+    translate: 0 0;
+    rotate: 0turn;
+    transform-origin: bottom left;
+    transition:
+      translate var(--move-anim-duration) ease-in-out,
+      rotate var(--move-anim-duration) ease-in-out;
+  }
+
+  .project-page__canvas-wrapper__inner {
+    --move-anim-duration: 0.8s;
+
+    display: grid;
+    place-items: center;
+    position: absolute;
+    inset: -2rem;
+    background: white;
+    clip-path: polygon(
+      100% 0,
+      100% calc(100% - 8rem),
+      calc(100% - 8rem) 100%,
+      0 100%,
+      0 0
+    );
+  }
+
+  .project-page__navigation {
+    font-size: 1.125rem;
+    line-height: 2rem;
+  }
+
+  .project-page__navigation--to-desc {
+    width: 8rem;
+    aspect-ratio: 1;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to bottom right,
+      white calc(50% + 3rem),
+      rgba(80, 80, 80, 0.2) calc(50% + 3rem),
+      transparent calc(50% + 3rem + 0.5rem)
+    );
+  }
+
+  .project-page__content {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+    width: 100%;
+    max-height: 100vh;
+    padding: 10rem 2.5rem 2.5rem 10rem;
+    overflow-y: auto;
+  }
+
+  body:has(.project-page__content__description:target) {
+    & .project-page__canvas-wrapper {
+      pointer-events: none;
+      translate: -8rem calc(-100% + 8rem);
+      rotate: -0.05turn;
+    }
+  }
+</style>

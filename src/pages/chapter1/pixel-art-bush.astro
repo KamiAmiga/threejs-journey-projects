@@ -1,0 +1,30 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import ProjectPage from '../../components/ProjectPage.astro'
+import PixelArtBush from '../../components/PixelArtBush.astro'
+---
+
+<Layout>
+  <ProjectPage title="Pixel art bush">
+    <PixelArtBush slot="project-code" />
+
+    <Fragment slot="project-description">
+      <p>Time to play with textures now !</p>
+      <p>
+        I wanted to make my own textures for these little bushes, and took a bit
+        of inspiration from HD-2D games aesthetics. So we have 2 kind of
+        materials in this scene : MeshStandardMaterial for the ground and the
+        small grass leaves and MeshBasicMaterial with transparency enabled for
+        the bushes.
+      </p>
+      <p>
+        The bushes and grass are simple PlaneGeometries, while the ground is
+        made from 2 CylinderGeometries of different sizes and color.
+      </p>
+      <p>
+        As for the ramen bowl scene, I used very simple lights : one
+        AmbientLight, one HemisphereLight and one PointLight.
+      </p>
+    </Fragment>
+  </ProjectPage>
+</Layout>

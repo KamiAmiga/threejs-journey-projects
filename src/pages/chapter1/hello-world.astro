@@ -1,19 +1,17 @@
 ---
 import Layout from '../../layouts/Layout.astro'
 import HelloWorld from '../../components/HelloWorld.astro'
-import ThreeJSCanvas from '../../components/ThreeJSCanvas.astro'
-import Description from '../../components/Description.astro'
+import ProjectPage from '../../components/ProjectPage.astro'
 ---
 
 <Layout>
-  <div class="page page--full-screen">
-    <ThreeJSCanvas />
-    <HelloWorld />
+  <ProjectPage title="Hello world !">
+    <HelloWorld slot="project-code" />
 
-    <Description title="Hello world !">
+    <Fragment slot="project-description">
       <p>
         Well... we all need to start somewhere, isn't it ? So this first scene
-        is a very basic application I made after watching the first lessons from
+        is a very basic one, that I made after watching the first lessons from
         the course : a full-screen, resizable renderer, a perspective camera,
         some orbit controls set up and a few meshes in a scene.
       </p>
@@ -24,6 +22,6 @@ import Description from '../../components/Description.astro'
         the same material type : MeshBasicMaterial, which allowed me to focus
         only on the colors at first without thinking of the lights.
       </p>
-    </Description>
-  </div>
+    </Fragment>
+  </ProjectPage>
 </Layout>

@@ -1,0 +1,444 @@
+<script>
+  import * as THREE from 'three'
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+  // Canvas
+  const canvas = document.querySelector('[data-threejs-canvas]')
+
+  // Common
+  const tableThickness = 0.25
+  const eggBaseSize = 0.4
+  const porkMeatThickness = 0.22
+  const porkFatThickness = 0.05
+  const noodlesThickness = 0.04
+
+  // Sizes
+  const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }
+
+  // Scene
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(0xf9f6e3)
+
+  // Geometries
+  const tableGeometry = new THREE.BoxGeometry(20, tableThickness, 12)
+  const chopstickGeometry = new THREE.CylinderGeometry(0.03, 0.075, 4.2, 4, 1)
+  const bowlGeometryExt = new THREE.SphereGeometry(
+    2,
+    32,
+    6,
+    Math.PI * 1.2,
+    Math.PI * 2.0,
+    0,
+    Math.PI * 0.4,
+  )
+  const bowlGeometryInt = new THREE.SphereGeometry(
+    1.9,
+    32,
+    6,
+    Math.PI * 1.2,
+    Math.PI * 2.0,
+    0,
+    Math.PI * 0.4,
+  )
+  const bowlGeometryTop = new THREE.RingGeometry(1.8, 1.9, 32)
+  const bowlGeometryBottom = new THREE.CylinderGeometry(0.75, 0.66, 0.25, 16, 1)
+  const brothGeometry = new THREE.CircleGeometry(1.7, 20)
+  const noriGeometry = new THREE.PlaneGeometry(1, 1.8)
+  const eggWhiteTopGeometry = new THREE.CircleGeometry(eggBaseSize, 20)
+  const eggWhiteBottomGeometry = new THREE.SphereGeometry(
+    eggBaseSize,
+    20,
+    6,
+    Math.PI * 1.2,
+    Math.PI * 2.0,
+    0,
+    Math.PI * 0.5,
+  )
+  const eggYolkGeometry = new THREE.CylinderGeometry(
+    eggBaseSize * 0.66,
+    eggBaseSize * 0.5,
+    0.15,
+    16,
+    2,
+  )
+  const porkGeometry = new THREE.BoxGeometry(1.1, 0.12, 1)
+  const noodlesGeometry = new THREE.TorusGeometry(
+    0.8,
+    noodlesThickness,
+    8,
+    20,
+    Math.PI,
+  )
+  const tangledNoodles = new THREE.TorusKnotGeometry(
+    0.6,
+    noodlesThickness,
+    64,
+    8,
+    4,
+    3,
+  )
+  const onionsGeometry = new THREE.CylinderGeometry(
+    0.07,
+    0.07,
+    0.05,
+    12,
+    1,
+    true,
+  )
+
+  // Materials
+  const tableMaterial = new THREE.MeshStandardMaterial({
+    color: 0xd7ac73,
+    roughness: 0.9,
+  })
+  const chopstickMaterial = new THREE.MeshStandardMaterial({
+    color: 0x7b3c20,
+    roughness: 0.9,
+  })
+  const bowlMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.1,
+    metalness: 0.25,
+    emissive: 0x141741,
+    side: THREE.DoubleSide,
+  })
+  const brothMaterial = new THREE.MeshStandardMaterial({
+    color: 0xe69872,
+    roughness: 0,
+    metalness: 0.1,
+    transparent: true,
+    opacity: 0.85,
+  })
+  const noriMaterial = new THREE.MeshStandardMaterial({
+    color: 0x101c19,
+    roughness: 0.3,
+    metalness: 0.5,
+    side: THREE.DoubleSide,
+  })
+  const eggWhiteMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    roughness: 0.25,
+    metalness: 0.1,
+    side: THREE.DoubleSide,
+  })
+  const eggYolkMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffaf1c,
+    roughness: 0.5,
+  })
+  const porkMeatMaterial = new THREE.MeshStandardMaterial({
+    color: 0xd87f8f,
+    roughness: 0.5,
+  })
+  const porkFatMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffe1dc,
+    roughness: 0.2,
+    metalness: 0.1,
+  })
+  const noodlesMaterial = new THREE.MeshStandardMaterial({
+    color: 0xf2d869,
+    roughness: 0.1,
+    metalness: 0.2,
+  })
+  const onionMaterial = new THREE.MeshStandardMaterial({
+    color: 0x4daf29,
+    roughness: 0.2,
+    side: THREE.DoubleSide,
+  })
+
+  // Assembling objects in the scene
+  const table = new THREE.Mesh(tableGeometry, tableMaterial)
+
+  const chopstick1 = new THREE.Mesh(chopstickGeometry, chopstickMaterial)
+  const chopstick2 = new THREE.Mesh(chopstickGeometry, chopstickMaterial)
+
+  const bowlExt = new THREE.Mesh(bowlGeometryExt, bowlMaterial)
+  const bowlInt = new THREE.Mesh(bowlGeometryInt, bowlMaterial)
+  const bowlTop = new THREE.Mesh(bowlGeometryTop, bowlMaterial)
+  const bowlBottom = new THREE.Mesh(bowlGeometryBottom, bowlMaterial)
+
+  const broth = new THREE.Mesh(brothGeometry, brothMaterial)
+
+  const nori1 = new THREE.Mesh(noriGeometry, noriMaterial)
+  const nori2 = new THREE.Mesh(noriGeometry, noriMaterial)
+  const nori3 = new THREE.Mesh(noriGeometry, noriMaterial)
+
+  const egg1WhiteTop = new THREE.Mesh(eggWhiteTopGeometry, eggWhiteMaterial)
+  const egg1WhiteBottom = new THREE.Mesh(
+    eggWhiteBottomGeometry,
+    eggWhiteMaterial,
+  )
+  const egg1Yolk = new THREE.Mesh(eggYolkGeometry, eggYolkMaterial)
+
+  const egg2WhiteTop = new THREE.Mesh(eggWhiteTopGeometry, eggWhiteMaterial)
+  const egg2WhiteBottom = new THREE.Mesh(
+    eggWhiteBottomGeometry,
+    eggWhiteMaterial,
+  )
+  const egg2Yolk = new THREE.Mesh(eggYolkGeometry, eggYolkMaterial)
+
+  const pork1MeatBottom = new THREE.Mesh(porkGeometry, porkMeatMaterial)
+  const pork1FatMiddle = new THREE.Mesh(porkGeometry, porkFatMaterial)
+  const pork1MeatTop = new THREE.Mesh(porkGeometry, porkMeatMaterial)
+  const pork1FatTop = new THREE.Mesh(porkGeometry, porkFatMaterial)
+
+  const pork2MeatBottom = new THREE.Mesh(porkGeometry, porkMeatMaterial)
+  const pork2FatMiddle = new THREE.Mesh(porkGeometry, porkFatMaterial)
+  const pork2MeatTop = new THREE.Mesh(porkGeometry, porkMeatMaterial)
+  const pork2FatTop = new THREE.Mesh(porkGeometry, porkFatMaterial)
+
+  const noodlesArray = []
+  for (let index = 0; index < 8; index++) {
+    noodlesArray.push(new THREE.Mesh(noodlesGeometry, noodlesMaterial))
+  }
+
+  const tangledNoodlesArray = []
+  for (let index = 0; index < 20; index++) {
+    tangledNoodlesArray.push(new THREE.Mesh(tangledNoodles, noodlesMaterial))
+  }
+
+  const onionsArray = []
+  for (let index = 0; index < 80; index++) {
+    onionsArray.push(new THREE.Mesh(onionsGeometry, onionMaterial))
+  }
+
+  const bowl = new THREE.Group()
+  bowl.add(bowlExt, bowlInt, bowlTop, bowlBottom)
+
+  const chopsticks = new THREE.Group()
+  chopsticks.add(chopstick1, chopstick2)
+
+  const noriGroup = new THREE.Group()
+  noriGroup.add(nori1, nori2, nori3)
+
+  const egg1White = new THREE.Group()
+  const egg1 = new THREE.Group()
+  egg1White.add(egg1WhiteTop, egg1WhiteBottom)
+  egg1.add(egg1White, egg1Yolk)
+
+  const egg2White = new THREE.Group()
+  const egg2 = new THREE.Group()
+  egg2White.add(egg2WhiteTop, egg2WhiteBottom)
+  egg2.add(egg2White, egg2Yolk)
+
+  const braisedPork1 = new THREE.Group()
+  braisedPork1.add(pork1MeatBottom, pork1FatMiddle, pork1MeatTop, pork1FatTop)
+
+  const braisedPork2 = new THREE.Group()
+  braisedPork2.add(pork2MeatBottom, pork2FatMiddle, pork2MeatTop, pork2FatTop)
+
+  const noodlesGroup = new THREE.Group()
+  noodlesGroup.add(...noodlesArray)
+
+  const tangledNoodlesGroup = new THREE.Group()
+  tangledNoodlesGroup.add(...tangledNoodlesArray)
+
+  const onionsGroup = new THREE.Group()
+  onionsGroup.add(...onionsArray)
+
+  const ramenGroup = new THREE.Group()
+  ramenGroup.add(
+    bowl,
+    broth,
+    noriGroup,
+    egg1,
+    egg2,
+    braisedPork1,
+    braisedPork2,
+    noodlesGroup,
+    tangledNoodlesGroup,
+    onionsGroup,
+  )
+
+  // Positionning objects in the scene
+  table.position.set(0, tableThickness * -0.5, -3.75)
+  ramenGroup.position.y = 2.1
+
+  chopstick2.position.x = 0.195
+  chopstick2.rotation.z = 0.05
+  chopsticks.position.set(2.25, 0.07, -0.465)
+  chopsticks.rotation.x = Math.PI * 0.5 + 0.025
+
+  bowlInt.position.y = 0.05
+  bowlTop.position.y = 0.62
+  bowlTop.rotation.x = Math.PI * 0.5
+  bowlBottom.position.y = 2
+  bowl.rotation.x = Math.PI
+
+  broth.position.y = -1
+  broth.rotation.x = Math.PI * -0.5
+
+  nori1.position.set(0, -0.4, -1.4)
+  nori2.position.set(-0.5, -0.5, -1.45)
+  nori2.rotation.y = 0.27
+  nori2.rotation.z = 0.125
+  nori3.position.set(0.6, -0.43, -1.44)
+  nori3.rotation.y = -0.3
+  nori3.rotation.z = -0.12
+  noriGroup.rotation.x = -0.465
+  noriGroup.position.set(0, 0.5, -0.54)
+
+  egg1WhiteBottom.rotation.x = Math.PI
+  egg1WhiteTop.rotation.x = Math.PI * -0.5
+  egg1WhiteTop.rotation.z = 0.545
+  egg1White.scale.x = 1.4
+  egg1Yolk.position.x = 0.14
+  egg1Yolk.position.y = -0.072
+  egg1.position.set(-0.95, -0.85, -0.6)
+  egg1.rotation.set(0.08, -0.71, 0)
+
+  egg2WhiteBottom.rotation.x = Math.PI
+  egg2WhiteTop.rotation.x = Math.PI * -0.5
+  egg2WhiteTop.rotation.z = 0.545
+  egg2White.scale.x = 1.4
+  egg2Yolk.position.x = 0.1
+  egg2Yolk.position.y = -0.072
+  egg2.position.set(-0.05, -0.9, -0.85)
+  egg2.rotation.set(0.08, -1.54, 0)
+
+  pork1MeatTop.scale.z = porkMeatThickness
+  pork1MeatBottom.scale.z = porkMeatThickness
+  pork1FatMiddle.scale.z = porkFatThickness
+  pork1FatTop.scale.z = porkFatThickness * 2
+  pork1MeatBottom.position.z = porkMeatThickness * -0.5
+  pork1FatMiddle.position.z = (porkMeatThickness + porkFatThickness * 0.5) * -1
+  pork1MeatTop.position.z = (porkMeatThickness * 1.5 + porkFatThickness) * -1
+  pork1FatTop.position.z = (porkMeatThickness * 2 + porkFatThickness * 2) * -1
+  braisedPork1.position.set(-0.5, -1, 0.85)
+  braisedPork1.rotation.set(0, 0.785, 0.035)
+
+  pork2MeatTop.scale.z = porkMeatThickness
+  pork2MeatBottom.scale.z = porkMeatThickness
+  pork2FatMiddle.scale.z = porkFatThickness
+  pork2FatTop.scale.z = porkFatThickness * 2
+  pork2MeatBottom.position.z = porkMeatThickness * -0.5
+  pork2FatMiddle.position.z = (porkMeatThickness + porkFatThickness * 0.5) * -1
+  pork2MeatTop.position.z = (porkMeatThickness * 1.5 + porkFatThickness) * -1
+  pork2FatTop.position.z = (porkMeatThickness * 2 + porkFatThickness * 2) * -1
+  braisedPork2.position.set(0, -0.955, 1)
+  braisedPork2.rotation.set(0, 1.17, 0.13)
+
+  noodlesArray.forEach((noodle, index) => {
+    noodle.position.set(
+      Math.random() * 0.1,
+      (noodlesArray.length - index) * -0.05 + Math.random() * 0.05,
+      (noodlesThickness * 2 + Math.random() * 0.02) * index,
+    )
+  })
+  noodlesGroup.scale.y = 0.4
+  noodlesGroup.position.set(0.42, -1.15, 0.25)
+  noodlesGroup.rotation.set(0.125, 0.85, 0)
+
+  tangledNoodlesArray.forEach((noodle) => {
+    const depth = Math.random() * 0.4
+    const randomFactor = () => {
+      if (depth > 0.33) return 1
+
+      if (depth > 0.25) return 0.85
+
+      if (depth > 0.16) return 0.66
+
+      return 0.4
+    }
+
+    const scaleFactor = () => {
+      if (depth > 0.25) return 1
+
+      if (depth > 0.16) return 0.8
+
+      return 0.66
+    }
+
+    noodle.position.set(
+      (Math.random() - 0.5) * randomFactor(),
+      (Math.random() - 0.5) * randomFactor(),
+      depth,
+    )
+
+    noodle.scale.set(scaleFactor(), scaleFactor(), scaleFactor())
+  })
+  tangledNoodlesGroup.rotation.x = Math.PI * -0.5
+  tangledNoodlesGroup.position.y = -1.3
+  tangledNoodlesGroup.scale.z = 0.4
+
+  onionsArray.forEach((onion) => {
+    const angle = Math.random() * Math.PI * 2
+    const radius = Math.random() * 0.5
+    const x = Math.sin(angle) * radius
+    const z = Math.cos(angle) * radius
+
+    onion.scale.set(
+      Math.random() * 0.2 + 0.8,
+      Math.random() * 0.2 + 0.8,
+      Math.random() * 0.2 + 0.6,
+    )
+    onion.position.set(x, Math.random() * 0.1, z)
+  })
+  onionsGroup.position.y = -1
+
+  scene.add(table, chopsticks, ramenGroup)
+
+  // Lights
+  const ambientLight = new THREE.AmbientLight(0xfefdfa, 1.2)
+  const hemisphereLight = new THREE.HemisphereLight(0xffffff, 0x0404a2, 1)
+  const pointLight = new THREE.PointLight(0xffffff, 5)
+  pointLight.position.set(-2.5, 2, 2)
+  const pointLight2 = new THREE.PointLight(0xffffff, 10)
+  pointLight2.position.set(0, 6, 0)
+
+  scene.add(ambientLight, hemisphereLight, pointLight, pointLight2)
+
+  // Camera
+  const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+  camera.lookAt(bowl.position)
+  camera.position.set(2, 2, 6)
+  scene.add(camera)
+
+  // Renderer
+  const renderer = canvas
+    ? new THREE.WebGLRenderer({ canvas })
+    : new THREE.WebGLRenderer()
+  renderer.setSize(sizes.width, sizes.height)
+
+  if (!canvas) {
+    document.body.appendChild(renderer.domElement)
+  }
+
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement)
+  controls.enableDamping = true
+  controls.enablePan = false
+  controls.minDistance = 3
+  controls.maxDistance = 6
+  controls.maxPolarAngle = 1.15
+  controls.update()
+
+  window.addEventListener('resize', () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  })
+
+  const tick = () => {
+    // Update controls
+    controls.update()
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+  }
+
+  tick()
+</script>

@@ -1,0 +1,30 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import Ramen from '../../components/Ramen.astro'
+import ProjectPage from '../../components/ProjectPage.astro'
+---
+
+<Layout>
+  <ProjectPage title="Primitives ramen bowl">
+    <Ramen slot="project-code" />
+
+    <Fragment slot="project-description">
+      <p>
+        For this (pork shôyu) ramen bowl (with an extra egg), I wanted to make a
+        scene using only Three.js primitives. So we have : BoxGeometries,
+        CylinderGeometries, SphereGeometries, RingGeometries, CircleGeometries,
+        PlaneGeometries and TorusGeometries and TorusKnotGeometries (for the
+        noodles). Lots of groups are used to gather the meshes by "theme" (a.k.a
+        ingredients in most cases), and some loops are used to duplicate and
+        place them in the scene.
+      </p>
+      <p>
+        I used the MeshStandardMaterial this time so I had to parameter a few
+        lights too : an AmbientLight, an HemisphereLight and 2 PointLights. I
+        wanted to keep things simple for the materials, so I didn't use any map,
+        but played with color, roughness, metalness and emissive properties
+        instead.
+      </p>
+    </Fragment>
+  </ProjectPage>
+</Layout>

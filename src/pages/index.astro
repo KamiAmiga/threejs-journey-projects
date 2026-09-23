@@ -1,23 +1,26 @@
 ---
+import Description from '../components/Description.astro'
 import Layout from '../layouts/Layout.astro'
 ---
 
 <Layout>
-  <header id="intro" class="page">
-    <h1>My journey with three.js journey</h1>
-    <p>
-      Welcome to this website where I'll share various exercises and experiments
-      done while learning Three.js from the&nbsp;<a
-        href="https://threejs-journey.com/"
-        target="_blank">Bruno Simon's three.js journey lessons</a
-      >.
-    </p>
+  <header id="intro" class="page squared-paper">
+    <Description title="My journey with three.js journey">
+      <!-- <h1>My journey with three.js journey</h1> -->
+      <p>
+        Welcome to this website where I'll share various exercises and
+        experiments done while learning Three.js from the&nbsp;<a
+          href="https://threejs-journey.com/"
+          target="_blank">Bruno Simon's three.js journey lessons</a
+        >.
+      </p>
+    </Description>
   </header>
 
-  <section>
-    <h2 class="bookmark"><a href="#chapter1">Chapter 1 : Basics</a></h2>
+  <section class="page squared-paper">
+    <h2 class="chapter-title">1: Basics</h2>
 
-    <div id="chapter1" class="page">
+    <div id="chapter1" class="chapter-text">
       <p>
         This first chapter is all about fundamentals : geometries, materials,
         textures... Everything needed to create my first Three.js scenes.
@@ -26,7 +29,18 @@ import Layout from '../layouts/Layout.astro'
       <ul>
         <li>
           <a href="/threejs-journey-projects/chapter1/hello-world"
-            >Hello world !</a>
+            >Hello world !</a
+          >
+        </li>
+        <li>
+          <a href="/threejs-journey-projects/chapter1/primitives-ramen-bowl"
+            >Primitive ramen bowl</a
+          >
+        </li>
+        <li>
+          <a href="/threejs-journey-projects/chapter1/pixel-art-bush"
+            >Pixel art bush</a
+          >
         </li>
       </ul>
     </div>
@@ -34,12 +48,11 @@ import Layout from '../layouts/Layout.astro'
 </Layout>
 
 <style>
-  .page:first-child {
-    z-index: 0;
-  }
-
-  .page:target {
-    z-index: 1;
+  .page {
+    width: fit-content;
+    padding: 2rem;
+    margin-block-start: 2rem;
+    margin-inline-start: 2rem;
   }
 
   ul {
@@ -48,16 +61,15 @@ import Layout from '../layouts/Layout.astro'
     list-style-type: none;
   }
 
-  .bookmark {
-    position: absolute;
-    left: max(15rem, 66vw);
+  .chapter-title {
+    padding-block: 1rem;
+    font-size: 2.5rem;
+    line-height: 4rem;
   }
 
-  section:nth-of-type(2) .bookmark {
-    top: 2em;
-  }
-
-  section:nth-of-type(3) .bookmark {
-    top: 4em;
+  .chapter-text {
+    padding-block-start: 0.5rem;
+    font-size: 1.125rem;
+    line-height: 2rem;
   }
 </style>
