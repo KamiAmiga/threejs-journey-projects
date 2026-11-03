@@ -1,6 +1,10 @@
 ---
 import ThreeJSCanvas from './ThreeJSCanvas.astro'
 import Description from './Description.astro'
+import Link from './Link.astro'
+import ArrowCircleDown from '../assets/icons/arrow-circle-down.svg'
+import ArrowCircleUp from '../assets/icons/arrow-circle-up.svg'
+import ChevronLeft from '../assets/icons/chevron-left.svg'
 
 const { class: className, title, ...rest } = Astro.props
 ---
@@ -13,12 +17,19 @@ const { class: className, title, ...rest } = Astro.props
       <slot name="project-code" />
     </div>
 
-    <a
-      class="project-page__navigation project-page__navigation--to-desc"
+    <Link
       href="#project-desc"
+      class="project-page__navigation project-page__navigation--to-desc"
+      withIcon={true}
     >
-      Show description
-    </a>
+      <span class="project-page__navigation__label">Show description </span>
+      <ArrowCircleDown
+        width={32}
+        height={32}
+        stroke="currentColor"
+        class="project-page__navigation__icon"
+      />
+    </Link>
   </div>
 
   <div class="project-page__content-wrapper">
@@ -31,111 +42,142 @@ const { class: className, title, ...rest } = Astro.props
         <slot name="project-description" />
       </Description>
 
-      <div class="project-page__navigation project-page__navigation--to-canvas">
-        <a href="#threejs-canvas">Hide description</a>
-      </div>
+      <Link
+        href="#threejs-canvas"
+        class="project-page__navigation project-page__navigation--to-canvas"
+        withIcon={true}
+      >
+        <ArrowCircleUp
+          width={32}
+          height={32}
+          stroke="currentColor"
+          class="project-page__navigation__icon"
+        />
 
-      <div class="project-page__navigation project-page__navigation--to-home">
-        <a href="/threejs-journey-projects">Back to chapters</a>
-      </div>
+        <span class="project-page__navigation__label"> Hide description </span>
+      </Link>
+
+      <Link
+        href="/threejs-journey-projects"
+        class="project-page__navigation project-page__navigation--to-home"
+        withIcon={true}
+      >
+        <ChevronLeft
+          width={32}
+          height={32}
+          stroke="currentColor"
+          class="project-page__navigation__icon"
+        />
+
+        <span class="project-page__navigation__label"> Back to chapters </span>
+      </Link>
     </div>
   </div>
+</div>
 
-  <style>
-    .project-page {
-      width: 100%;
-      height: 100vh;
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      overflow: clip;
+<style>
+  .project-page {
+    width: 100%;
+    height: 100vh;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    overflow: clip;
+  }
+
+  .project-page__canvas-wrapper {
+    --move-anim-duration: 0.8s;
+    position: absolute;
+    inset: 0;
+    translate: 0 0;
+    rotate: 0turn;
+    transform-origin: bottom left;
+    transition:
+      translate var(--move-anim-duration) ease-in-out,
+      rotate var(--move-anim-duration) ease-in-out;
+  }
+
+  .project-page__canvas-wrapper__inner {
+    --move-anim-duration: 0.8s;
+
+    display: grid;
+    place-items: center;
+    position: absolute;
+    inset: -2rem;
+    background: white;
+    clip-path: polygon(
+      100% 0,
+      100% calc(100% - 8rem),
+      calc(100% - 8rem) 100%,
+      0 100%,
+      0 0
+    );
+  }
+
+  .project-page__navigation--to-desc {
+    width: 8rem;
+    aspect-ratio: 1;
+    padding: 0.5rem;
+    grid-template-columns: auto;
+    grid-template-rows: min-content 1.5rem;
+    align-items: start;
+    justify-content: start;
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    z-index: 1;
+    background: linear-gradient(
+      to bottom right,
+      white calc(50% + 3rem),
+      rgba(80, 80, 80, 0.2) calc(50% + 3rem),
+      transparent calc(50% + 3rem + 0.5rem)
+    );
+  }
+
+  .project-page__navigation__icon {
+    width: 100%;
+  }
+
+  .project-page__navigation--to-desc .project-page__navigation__icon {
+    width: 1.5rem;
+    margin-inline-start: 1.5rem;
+  }
+
+  .project-page__content-wrapper {
+    width: 100%;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .project-page__content {
+    display: flex;
+    flex-direction: column;
+    row-gap: 2rem;
+    min-height: 100vh;
+    padding: 6rem 2.5rem 2.5rem 4rem;
+  }
+
+  body:has(.project-page__content__description:target) {
+    & .project-page__canvas-wrapper {
+      --x-translate: -8rem;
+      --y-translate-margin: 4rem;
+
+      pointer-events: none;
+      translate: -8rem calc(-100% + var(--y-translate-margin));
+      rotate: -0.05turn;
     }
+  }
 
-    .project-page__canvas-wrapper {
-      --move-anim-duration: 0.8s;
-      position: absolute;
-      inset: 0;
-      translate: 0 0;
-      rotate: 0turn;
-      transform-origin: bottom left;
-      transition:
-        translate var(--move-anim-duration) ease-in-out,
-        rotate var(--move-anim-duration) ease-in-out;
-    }
-
-    .project-page__canvas-wrapper__inner {
-      --move-anim-duration: 0.8s;
-
-      display: grid;
-      place-items: center;
-      position: absolute;
-      inset: -2rem;
-      background: white;
-      clip-path: polygon(
-        100% 0,
-        100% calc(100% - 8rem),
-        calc(100% - 8rem) 100%,
-        0 100%,
-        0 0
-      );
-    }
-
-    .project-page__navigation {
-      font-size: 1.125rem;
-      line-height: 2rem;
-    }
-
-    .project-page__navigation--to-desc {
-      width: 8rem;
-      aspect-ratio: 1;
-      position: fixed;
-      bottom: 0;
-      right: 0;
-      z-index: 1;
-      background: linear-gradient(
-        to bottom right,
-        white calc(50% + 3rem),
-        rgba(80, 80, 80, 0.2) calc(50% + 3rem),
-        transparent calc(50% + 3rem + 0.5rem)
-      );
-    }
-
-    .project-page__content-wrapper {
-      width: 100%;
-      max-height: 100vh;
-      overflow-y: auto;
-    }
-
+  @media screen and (width >= 40rem) {
     .project-page__content {
-      display: flex;
-      flex-direction: column;
-      row-gap: 2rem;
-      min-height: 100vh;
-      padding: 6rem 2.5rem 2.5rem 4rem;
+      padding-block-start: 10rem;
+      padding-inline-start: 10rem;
     }
 
     body:has(.project-page__content__description:target) {
       & .project-page__canvas-wrapper {
-        --x-translate: -8rem;
-        --y-translate-margin: 4rem;
-
-        pointer-events: none;
-        translate: -8rem calc(-100% + var(--y-translate-margin));
-        rotate: -0.05turn;
+        --y-translate-margin: 8rem;
       }
     }
-
-    @media screen and (width >= 40rem) {
-      .project-page__content {
-        padding-block-start: 10rem;
-        padding-inline-start: 10rem;
-      }
-
-      body:has(.project-page__content__description:target) {
-        & .project-page__canvas-wrapper {
-          --y-translate-margin: 8rem;
-        }
-      }
-    }
-  </style>
-</div>
+  }
+</style>

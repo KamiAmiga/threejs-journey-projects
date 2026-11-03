@@ -1,0 +1,36 @@
+---
+const { class: className, href, withIcon, ...rest } = Astro.props
+---
+
+<a
+  href={href}
+  class:list={['link', className, { 'link--with-icon': withIcon }]}
+  {...rest}
+>
+  <slot />
+</a>
+
+<style>
+  .link {
+    font-size: 1.125rem;
+    line-height: 2rem;
+    color: var(--color-accent-shade-2);
+    text-decoration: wavy underline;
+    text-decoration-thickness: 2px;
+    text-decoration-color: var(--color-accent-shade-3);
+    text-decoration-skip-ink: none;
+    transition: text-decoration-color 0.2s ease-out;
+  }
+
+  .link:hover {
+    text-decoration-color: transparent;
+  }
+
+  .link--with-icon {
+    display: inline-grid;
+    align-items: end;
+    gap: 0.5rem;
+    grid-template-columns: 1.5rem 1fr;
+    width: fit-content;
+  }
+</style>
