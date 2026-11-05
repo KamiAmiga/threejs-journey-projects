@@ -152,9 +152,17 @@ const { class: className, title, ...rest } = Astro.props
   .project-page__content {
     display: flex;
     flex-direction: column;
-    row-gap: 2rem;
     min-height: 100vh;
-    padding: 6rem 2.5rem 2.5rem 4rem;
+    padding: calc(var(--squared-paper-unit) * 2) var(--squared-paper-unit)
+      var(--squared-paper-unit) calc(var(--squared-paper-unit) * 2);
+  }
+
+  .project-page__navigation--to-canvas {
+    margin-block-start: calc(var(--squared-paper-unit) + 1.125rem);
+  }
+
+  .project-page__navigation--to-home {
+    margin-block-start: 1rem;
   }
 
   body:has(.project-page__content__description:target) {
@@ -170,8 +178,13 @@ const { class: className, title, ...rest } = Astro.props
 
   @media screen and (width >= 40rem) {
     .project-page__content {
-      padding-block-start: 10rem;
-      padding-inline-start: 10rem;
+      padding-block-start: calc(var(--squared-paper-unit) * 4);
+      padding-inline-start: calc(var(--squared-paper-unit) * 4);
+    }
+
+    .project-page__navigation--to-canvas,
+    .project-page__navigation--to-home {
+      margin-block-start: var(--squared-paper-unit);
     }
 
     body:has(.project-page__content__description:target) {
