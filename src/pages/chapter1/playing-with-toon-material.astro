@@ -1,0 +1,25 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import ProjectPage from '../../components/ProjectPage.astro'
+import ToonMaterial from '../../components/ToonMaterial.astro'
+---
+
+<Layout>
+  <ProjectPage title="Playing with toon material">
+    <ToonMaterial slot="project-code" />
+
+    <Fragment slot="project-description">
+      <p>
+        As a gamer who loves JRPGs, adventure games and cell shading aesthetics,
+        I was very curious about the toon material.
+      </p>
+      <p>
+        I ended up a bit disappointed when trying to play with it using those
+        basic meshes. It felt a bit limited to me, but I assumed it would show
+        most of it strength with custom / complex models and textures. That's
+        why I postponed its exploration until I would feel able to make my own
+        models and textures ! :D
+      </p>
+    </Fragment>
+  </ProjectPage>
+</Layout>
