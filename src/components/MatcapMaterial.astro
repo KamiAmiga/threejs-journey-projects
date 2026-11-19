@@ -1,0 +1,214 @@
+<script>
+  import * as THREE from 'three'
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+  import GUI from 'lil-gui'
+
+  // THREE Settings
+  THREE.ColorManagement.enabled = true
+
+  // Canvas
+  const canvas = document.querySelector('[data-threejs-canvas]')
+
+  // Debug UI
+  const gui = new GUI({
+    container: document.querySelector(
+      '.project-page__canvas-wrapper',
+    ) as HTMLDivElement,
+  })
+
+  // TextureLoader
+  const loadingManager = new THREE.LoadingManager()
+  const textureLoader = new THREE.TextureLoader(loadingManager)
+
+  // Sizes
+  const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }
+
+  // Scene
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(0x151515)
+
+  // Geometries
+  const coneGeometry = new THREE.ConeGeometry(0.5, 1, 16)
+  const sphereGeometry = new THREE.SphereGeometry(0.5, 64, 64)
+  const torusKnotGeometry = new THREE.TorusKnotGeometry(0.33, 0.1)
+  const cubeGeometry = new THREE.BoxGeometry(0.8, 0.8, 0.8, 64, 64)
+  const planeGeometry = new THREE.PlaneGeometry()
+
+  // Textures
+  const matcap1 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/1.png',
+  )
+  const matcap2 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/2.png',
+  )
+  const matcap3 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/3.png',
+  )
+  const matcap4 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/4.png',
+  )
+  const matcap5 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/5.png',
+  )
+  const matcap6 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/6.png',
+  )
+  const matcap7 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/7.png',
+  )
+  const matcapCustom1 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/custom1.png',
+  )
+  const matcapCustom2 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/custom2.png',
+  )
+  const matcapCustom3 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/custom3.png',
+  )
+  const matcapCustom4 = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/custom4.png',
+  )
+  const fabricLaceOpacity = textureLoader.load(
+    '/threejs-journey-projects/textures/matcap-material/Fabric_Lace_045_opacity.png',
+  )
+
+  const textures = [
+    matcap1,
+    matcap2,
+    matcap3,
+    matcap4,
+    matcap5,
+    matcapCustom1,
+    matcapCustom2,
+    matcapCustom3,
+    matcapCustom4,
+    fabricLaceOpacity,
+  ]
+
+  textures.forEach((texture) => {
+    texture.generateMipmaps = false
+    texture.minFilter = THREE.NearestFilter
+    texture.magFilter = THREE.NearestFilter
+    texture.colorSpace = THREE.SRGBColorSpace
+  })
+
+  // Materials
+  const material = new THREE.MeshMatcapMaterial({
+    matcap: matcap1,
+    transparent: true,
+  })
+
+  // Assembling objects in the scene
+  const coneMesh = new THREE.Mesh(coneGeometry, material)
+  const sphereMesh = new THREE.Mesh(sphereGeometry, material)
+  const torusKnotMesh = new THREE.Mesh(torusKnotGeometry, material)
+  const cubeMesh = new THREE.Mesh(cubeGeometry, material)
+  const planeMesh = new THREE.Mesh(planeGeometry, material)
+
+  coneMesh.position.set(-1.5, 0, -1.5)
+  sphereMesh.position.set(1.5, 0, -1.5)
+  torusKnotMesh.position.set(1.5, 0, 1.5)
+  cubeMesh.position.set(-1.5, 0, 1.5)
+
+  scene.add(coneMesh, sphereMesh, torusKnotMesh, cubeMesh, planeMesh)
+
+  // Camera
+  const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+  camera.position.set(0, 2, 5)
+  scene.add(camera)
+
+  // Renderer
+  const renderer = canvas
+    ? new THREE.WebGLRenderer({ canvas })
+    : new THREE.WebGLRenderer()
+  renderer.setSize(sizes.width, sizes.height)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+  if (!canvas) {
+    document.body.appendChild(renderer.domElement)
+  }
+
+  // Debug UI Params
+  gui.addColor(material, 'color')
+  gui.add(material, 'matcap', {
+    matcap1,
+    matcap2,
+    matcap3,
+    matcap4,
+    matcap5,
+    matcap6,
+    matcap7,
+    matcapCustom1,
+    matcapCustom2,
+    matcapCustom3,
+    matcapCustom4,
+  })
+  gui.add(material, 'opacity').min(0).max(1).step(0.05)
+
+  const alphaDebug = {
+    alphaMap: null,
+  }
+  gui
+    .add(alphaDebug, 'alphaMap', { None: null, FabricLace: fabricLaceOpacity })
+    .onChange((value: null | THREE.Texture) => {
+      material.alphaMap = value
+      material.needsUpdate = true
+    })
+
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement)
+  controls.enableDamping = true
+  controls.minDistance = 3
+  controls.update()
+
+  window.addEventListener('resize', () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  })
+
+  /**
+   * Animate
+   */
+  const timer = new THREE.Timer()
+  timer.connect(document)
+
+  const tick = () => {
+    timer.update()
+    const timeDelta = timer.getElapsed()
+
+    coneMesh.rotation.y = 0.1 * timeDelta
+    sphereMesh.rotation.y = 0.1 * timeDelta
+    torusKnotMesh.rotation.y = 0.1 * timeDelta
+    cubeMesh.rotation.y = 0.1 * timeDelta
+    planeMesh.rotation.y = 0.1 * timeDelta
+
+    coneMesh.rotation.x = 0.15 * timeDelta
+    sphereMesh.rotation.x = 0.15 * timeDelta
+    torusKnotMesh.rotation.x = 0.15 * timeDelta
+    cubeMesh.rotation.x = 0.15 * timeDelta
+    planeMesh.rotation.x = 0.15 * timeDelta
+
+    // Update controls
+    controls.update()
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+  }
+
+  tick()
+</script>

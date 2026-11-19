@@ -1,0 +1,20 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import ProjectPage from '../../components/ProjectPage.astro'
+import MatcapMaterial from '../../components/MatcapMaterial.astro'
+---
+
+<Layout>
+  <ProjectPage title="Playing with matcap material">
+    <MatcapMaterial slot="project-code" />
+
+    <Fragment slot="project-description">
+      <p>I didn't think I would enjoy MeshMatcapMaterial that much. :D</p>
+      <p>
+        But it is an invitation to test and create so many different textures,
+        and the way it works is so intriguing ! I knew I would experiment a bit
+        longer with this one.
+      </p>
+    </Fragment>
+  </ProjectPage>
+</Layout>
