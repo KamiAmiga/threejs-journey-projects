@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import ProjectPage from '../../components/ProjectPage.astro'
+import EyeSeeYou from '../../components/EyeSeeYou.astro'
+---
+
+<Layout>
+  <ProjectPage title="Eye see you">
+    <EyeSeeYou slot="project-code" />
+
+    <Fragment slot="project-description">
+      <p>Just me having fun with matcap material :D</p>
+      <p>
+        2 SphereGeometries, with a custom matcap texture (much inspired by an
+        enemy from Super Mario 64...), and a BoxGeometry with a
+        MeshBasicMaterial of the same color as the scene to partially hide those
+        spheres.
+      </p>
+      <p>Kinda spooky, isn't it ?</p>
+    </Fragment>
+  </ProjectPage>
+</Layout>

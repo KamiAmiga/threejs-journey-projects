@@ -1,0 +1,111 @@
+<script>
+  import * as THREE from 'three'
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+  // THREE Settings
+  THREE.ColorManagement.enabled = true
+
+  // Canvas
+  const canvas = document.querySelector('[data-threejs-canvas]')
+
+  // TextureLoader
+  const loadingManager = new THREE.LoadingManager()
+  const textureLoader = new THREE.TextureLoader(loadingManager)
+
+  // Sizes
+  const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }
+
+  // Scene
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(0x151515)
+
+  // Geometries
+  const sphereGeometry = new THREE.SphereGeometry(0.5, 64, 64)
+  const cubeGeometry = new THREE.BoxGeometry(6, 2, 2)
+
+  // Textures
+  const texture = textureLoader.load(
+    '/threejs-journey-projects/textures/eye-see-you/matcap-eye.png',
+  )
+
+  texture.generateMipmaps = false
+  texture.minFilter = THREE.NearestFilter
+  texture.magFilter = THREE.NearestFilter
+  texture.colorSpace = THREE.SRGBColorSpace
+
+  // Materials
+  const eyeMaterial = new THREE.MeshMatcapMaterial({
+    matcap: texture,
+    transparent: true,
+  })
+
+  const maskMaterial = new THREE.MeshBasicMaterial({
+    color: 0x151515,
+  })
+
+  // Assembling objects in the scene
+  const leftEye = new THREE.Mesh(sphereGeometry, eyeMaterial)
+  const rightEye = new THREE.Mesh(sphereGeometry, eyeMaterial)
+  const mask = new THREE.Mesh(cubeGeometry, maskMaterial)
+
+  leftEye.position.set(-1, 0, 0)
+  rightEye.position.set(1, 0, 0)
+  mask.position.z = -1
+
+  scene.add(leftEye, rightEye, mask)
+
+  // Camera
+  const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+  camera.position.set(0, 0, 4)
+  scene.add(camera)
+
+  // Renderer
+  const renderer = canvas
+    ? new THREE.WebGLRenderer({ canvas })
+    : new THREE.WebGLRenderer()
+  renderer.setSize(sizes.width, sizes.height)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+  if (!canvas) {
+    document.body.appendChild(renderer.domElement)
+  }
+
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement)
+  controls.enableDamping = true
+  controls.enablePan = false
+  controls.maxAzimuthAngle = 1.25
+  controls.minAzimuthAngle = -1.25
+  controls.minDistance = 3
+  controls.update()
+
+  window.addEventListener('resize', () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  })
+
+  const tick = () => {
+    // Update controls
+    controls.update()
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+  }
+
+  tick()
+</script>
