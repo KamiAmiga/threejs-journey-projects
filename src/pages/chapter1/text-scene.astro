@@ -1,0 +1,25 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import ProjectPage from '../../components/ProjectPage.astro'
+import TextScene from '../../components/TextScene.astro'
+---
+
+<Layout>
+  <ProjectPage title="Text Scene">
+    <TextScene slot="project-code" />
+
+    <Fragment slot="project-description">
+      <p>
+        First experimentation with the TextGeometry. The scene is very similar
+        to the one we build during the lesson 13 "3d text".
+      </p>
+      <p>
+        I made very simple entry animations with GSAP, and used
+        MeshNormalMaterial on the text and the BoxGeometries around it. I think
+        I'll come back to text experimentations later, when I'll have studied
+        more advanced techniques, and maybe get inspiration from some inspiring
+        Codrops tutorials.
+      </p>
+    </Fragment>
+  </ProjectPage>
+</Layout>

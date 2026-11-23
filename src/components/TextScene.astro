@@ -1,0 +1,184 @@
+<script>
+  import * as THREE from 'three'
+  import gsap from 'gsap'
+  import GUI from 'lil-gui'
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+  import { FontLoader } from 'three/addons/loaders/FontLoader.js'
+  import { TextGeometry } from 'three/addons/geometries/TextGeometry.js'
+
+  // THREE Settings
+  THREE.ColorManagement.enabled = false
+
+  // Canvas
+  const canvas = document.querySelector('[data-threejs-canvas]')
+
+  // Debug UI
+  const gui = new GUI({
+    container: document.querySelector(
+      '.project-page__canvas-wrapper',
+    ) as HTMLDivElement,
+  })
+
+  // Init GSAP timeline
+  const timeline = gsap.timeline()
+
+  // FontLoader
+  const fontLoader = new FontLoader()
+
+  // Sizes
+  const sizes = {
+    width: window.innerWidth,
+    height: window.innerHeight,
+  }
+
+  // Scene
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color(0x1f1563)
+
+  // Geometries
+  const boxGeometry = new THREE.BoxGeometry(0.3, 0.3, 0.3)
+
+  // Materials
+  const material = new THREE.MeshNormalMaterial()
+
+  // Assembling objects in the scene
+  const cubes: THREE.Mesh[] = []
+
+  for (let index = 0; index < 50; index++) {
+    const cube = new THREE.Mesh(boxGeometry, material)
+    const scale = Math.max(0.2, Math.random())
+
+    cube.position.set(
+      (Math.random() - 0.5) * 6,
+      (Math.random() - 0.5) * 6,
+      (Math.random() - 0.5) * 6,
+    )
+
+    cube.rotation.x = Math.random() * Math.PI
+    cube.rotation.y = Math.random() * Math.PI
+
+    cube.scale.set(scale, scale, scale)
+
+    cubes.push(cube)
+
+    scene.add(cube)
+  }
+
+  // Add text and anim on font load
+  fontLoader.load(
+    '/threejs-journey-projects/threejs-fonts/droid/droid_sans_mono_regular.typeface.json',
+    (font) => {
+      const textGeometry = new TextGeometry('Hi 3JS !', {
+        font,
+        size: 0.5,
+        depth: 0.2,
+        curveSegments: 16,
+        bevelEnabled: true,
+        bevelThickness: 0.02,
+        bevelSize: 0.02,
+        bevelOffset: 0,
+        bevelSegments: 8,
+      })
+      textGeometry.center()
+
+      const text = new THREE.Mesh(textGeometry, material)
+
+      scene.add(text)
+
+      timeline
+        .from(text.scale, {
+          duration: 1,
+          delay: 0.5,
+          x: 0,
+          y: 0,
+          z: 0,
+          ease: 'elastic.out(1.1,0.4)',
+        })
+        .from(
+          cubes.map((cube) => cube.scale),
+          {
+            duration: 0.5,
+            x: 0,
+            y: 0,
+            z: 0,
+            ease: 'power2.inOut',
+            stagger: {
+              amount: 0.2,
+              ease: 'power2.in',
+            },
+          },
+        )
+        .to(
+          cubes.map((cube) => cube.rotation),
+          {
+            duration: 0.5,
+            x: '+=4turn',
+            y: '+=4turn',
+            ease: 'power2.inOut',
+            stagger: {
+              amount: 0.2,
+              ease: 'power2.in',
+            },
+          },
+          '<',
+        )
+    },
+  )
+
+  // Camera
+  const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height)
+  camera.position.set(0, 0, 4)
+  scene.add(camera)
+
+  // Renderer
+  const renderer = canvas
+    ? new THREE.WebGLRenderer({ canvas })
+    : new THREE.WebGLRenderer()
+  renderer.setSize(sizes.width, sizes.height)
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+
+  if (!canvas) {
+    document.body.appendChild(renderer.domElement)
+  }
+
+  // Debug UI Params
+  const replayAnimDebug = {
+    replay: () => {
+      timeline.restart()
+    },
+  }
+  gui.add(replayAnimDebug, 'replay')
+
+  // Controls
+  const controls = new OrbitControls(camera, renderer.domElement)
+  controls.enableDamping = true
+  controls.minDistance = 2
+  controls.update()
+
+  window.addEventListener('resize', () => {
+    // Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+
+    // Update camera
+    camera.aspect = sizes.width / sizes.height
+    camera.updateProjectionMatrix()
+
+    // Update renderer
+    renderer.setSize(sizes.width, sizes.height)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  })
+
+  const tick = () => {
+    // Update controls
+    controls.update()
+
+    // Render
+    renderer.render(scene, camera)
+
+    // Call tick again on the next frame
+    window.requestAnimationFrame(tick)
+  }
+
+  tick()
+</script>
